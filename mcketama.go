@@ -1,3 +1,5 @@
+// Package gomcketama implements a ServerSelector for gomemcache that provides
+// ketama hashing that's compatible with SpyMemcached's ketama hashing.
 package gomcketama
 
 import (
