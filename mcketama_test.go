@@ -33,7 +33,7 @@ func TestNodeKeys(t *testing.T) {
 func TestKVToNode(t *testing.T) {
 	ks := &KetamaServerSelector{}
 
-	for h, _ := range nodeKeys {
+	for h := range nodeKeys {
 		ks.AddServer(h)
 	}
 

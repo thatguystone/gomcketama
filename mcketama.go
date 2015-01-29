@@ -22,6 +22,7 @@ type info struct {
 
 type infoSlice []info
 
+// KetamaServerSelector implements gomemcache's ServerSelector
 type KetamaServerSelector struct {
 	lock  sync.RWMutex
 	addrs []net.Addr
@@ -40,6 +41,7 @@ func (s infoSlice) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
+// AddServer adds a server to the ketama continuum.
 func (ks *KetamaServerSelector) AddServer(server string) error {
 	addr, keys, err := prepServer(server)
 	if err != nil {
@@ -70,6 +72,8 @@ func (ks *KetamaServerSelector) AddServer(server string) error {
 	return nil
 }
 
+// PickServer returns the server address that a given item should be written
+// to.
 func (ks *KetamaServerSelector) PickServer(key string) (net.Addr, error) {
 	if len(ks.addrs) == 0 {
 		return nil, mc.ErrNoServers
@@ -95,6 +99,7 @@ func (ks *KetamaServerSelector) PickServer(key string) (net.Addr, error) {
 	return ks.ring[i].addr, nil
 }
 
+// Each loops through all registered servers, calling the given function.
 func (ks *KetamaServerSelector) Each(f func(net.Addr) error) error {
 	ks.lock.RLock()
 	defer ks.lock.RUnlock()
@@ -106,7 +111,8 @@ func (ks *KetamaServerSelector) Each(f func(net.Addr) error) error {
 	return nil
 }
 
-// NewClient creates a new memcache client with the given servers
+// NewClient creates a new memcache client with the given servers. This
+// functions exactly like gomemcache's New().
 func NewClient(server ...string) *mc.Client {
 	ks := &KetamaServerSelector{}
 
