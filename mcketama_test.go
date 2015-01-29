@@ -2,12 +2,15 @@ package gomcketama
 
 import (
 	"fmt"
+	"net"
 	"testing"
 
 	mc "github.com/bradfitz/gomemcache/memcache"
 )
 
 func TestNodeKeys(t *testing.T) {
+	t.Parallel()
+
 	for h, nKeys := range nodeKeys {
 		_, keys, err := prepServer(h)
 		if err != nil {
@@ -31,21 +34,29 @@ func TestNodeKeys(t *testing.T) {
 }
 
 func TestKVToNode(t *testing.T) {
+	t.Parallel()
+
 	ks := &KetamaServerSelector{}
 
 	for h := range nodeKeys {
 		ks.AddServer(h)
 	}
 
+	hostToAddr := make(map[string]net.Addr)
 	for k, h := range kvToNode {
 		a, err := ks.PickServer(k)
 		if err != nil {
 			t.Fatalf("got error instead of server: %s", err)
 		}
 
-		ae, err := lookup(h)
-		if err != nil {
-			t.Fatalf("expected server lookup failed: %s", err)
+		ae, ok := hostToAddr[h]
+		if !ok {
+			ae, err = lookup(h)
+			if err != nil {
+				t.Fatalf("expected server lookup failed: %s", err)
+			}
+
+			hostToAddr[h] = ae
 		}
 
 		if a.String() != ae.String() {
@@ -58,6 +69,8 @@ func TestKVToNode(t *testing.T) {
 }
 
 func TestMemcache(t *testing.T) {
+	t.Parallel()
+
 	m := New("localhost:11211", "localhost:11212")
 
 	for i := 0; i < 100; i++ {
