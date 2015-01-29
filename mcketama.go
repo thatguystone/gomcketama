@@ -113,9 +113,9 @@ func (ks *KetamaServerSelector) Each(f func(net.Addr) error) error {
 	return nil
 }
 
-// NewClient creates a new memcache client with the given servers. This
-// functions exactly like gomemcache's New().
-func NewClient(server ...string) *mc.Client {
+// New creates a new memcache client with the given servers, using ketama as
+// the ServerSelector. This functions exactly like gomemcache's New().
+func New(server ...string) *mc.Client {
 	ks := &KetamaServerSelector{}
 
 	for _, s := range server {

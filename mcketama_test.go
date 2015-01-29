@@ -58,7 +58,7 @@ func TestKVToNode(t *testing.T) {
 }
 
 func TestMemcache(t *testing.T) {
-	m := NewClient("localhost:11211", "localhost:11212")
+	m := New("localhost:11211", "localhost:11212")
 
 	for i := 0; i < 100; i++ {
 		err := m.Set(&mc.Item{
